@@ -1,0 +1,6 @@
+bs4
+fuzzywuzzy
+python-Levenshtein
+thefuzz
+rapidfuzz
+pylcs
