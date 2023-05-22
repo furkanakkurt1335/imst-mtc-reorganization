@@ -23,7 +23,7 @@ for sent_id in treebank_d.keys():
 avg_token_count /= len(treebank_d.keys())
 print(f'avg_token_count: {avg_token_count}')
 
-sent_corp_path = os.path.join(THIS_DIR, 'sent_corp_idx.json')
+sent_corp_path = os.path.join(THIS_DIR, 'sent_corp.json')
 with open(sent_corp_path, 'r', encoding='utf-8') as f:
     sent_corp_d = json.load(f)
 
