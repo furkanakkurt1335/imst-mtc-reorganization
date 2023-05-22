@@ -1,7 +1,4 @@
-import os, re, json
-# from thefuzz import fuzz, process
-from rapidfuzz import fuzz, process
-from time import sleep
+import os, json, difflib
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 treebank_path = os.path.join(THIS_DIR, 'treebank.json')
@@ -17,13 +14,25 @@ tb_len = len(treebank_d.keys())
 counter = 0
 for k, v in treebank_d.items():
     text_t = v['text']
-    match = process.extractOne(text_t, corpus_d, scorer=fuzz.token_set_ratio)
-    doc_id = match[2]
+    max_size, doc_id_max, idx = 0, None, None
+    for doc_id, body in corpus_d.items():
+        s = difflib.SequenceMatcher(None, text_t, body)
+        size_t = s.find_longest_match().size
+        if size_t == len(text_t):
+            doc_id_max = doc_id
+            idx = s.find_longest_match().b
+            break
+        elif size_t > max_size:
+            max_size = size_t
+            doc_id_max = doc_id
+            idx = s.find_longest_match().b
+    doc_id = doc_id_max
     if doc_id not in sent_corp_d.keys():
-        sent_corp_d[doc_id] = []
-    sent_corp_d[doc_id].append(k)
+        sent_corp_d[doc_id] = {}
+    sent_corp_d[doc_id][k] = idx
     counter += 1
-    print('Remaining: {}'.format(tb_len - counter))
+    if counter % 10 == 0:
+        print('Remaining: {}'.format(tb_len - counter))
 
 with open('sent_corp.json', 'w', encoding='utf-8') as f:
     json.dump(sent_corp_d, f, ensure_ascii=False, indent=2)
