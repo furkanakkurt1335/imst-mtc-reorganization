@@ -4,3 +4,4 @@ python-Levenshtein
 thefuzz
 rapidfuzz
 pylcs
+stanza

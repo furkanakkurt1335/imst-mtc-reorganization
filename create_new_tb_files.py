@@ -1,4 +1,5 @@
-import os, re, json
+import os, json, stanza
+from rapidfuzz import fuzz, process
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -10,6 +11,28 @@ new_treebank_path = os.path.join(THIS_DIR, 'new_treebank.json')
 with open(new_treebank_path, 'r', encoding='utf-8') as f:
     new_treebank_d = json.load(f)
 
+corpus_path = os.path.join(THIS_DIR, 'corpus.json')
+with open(corpus_path, 'r', encoding='utf-8') as f:
+    corpus_d = json.load(f)
+
+nlp = stanza.Pipeline(lang='tr', processors='tokenize')
+
+for split in ['train', 'dev', 'test']:
+    for doc_d in new_treebank_d[split]:
+        doc_id = doc_d['doc_id']
+        doc_body = corpus_d[doc_id + '.xcs']
+        doc = nlp(doc_body)
+        sent_l = []
+        for i, sentence in enumerate(doc.sentences):
+            sent_l.append(sentence.text)
+        sent_ids = doc_d['sent_ids']
+        for i, sent_id in enumerate(sent_ids):
+            md_t = treebank_d[sent_id]
+            text = md_t['text']
+            print(text, sent_l)
+            input()
+            match = process.extractOne(text, sent_l, scorer=fuzz.token_set_ratio)
+            
 split_l = ['train', 'dev', 'test']
 for split in split_l:
     tb_l = []
@@ -17,15 +40,16 @@ for split in split_l:
         doc_id = doc_d['doc_id']
         sent_ids = doc_d['sent_ids']
         for i, sent_id in enumerate(sent_ids):
-            sent_id_s = f'# sent_id = {sent_id}'
+            old_sent_id_s = f'# old_sent_id = {sent_id}'
+            sent_id_s = f'# sent_id = {doc_id}_{i}'
             md_t = treebank_d[sent_id]
             text, table = md_t['text'], md_t['table']
             text_s = f'# text = {text}'
             if i == 0:
                 doc_s = f'# newdoc id = {doc_id}'
-                md_l = [doc_s, sent_id_s, text_s, table]
+                md_l = [doc_s, old_sent_id_s, sent_id_s, text_s, table]
             else:
-                md_l = [sent_id_s, text_s, table]
+                md_l = [old_sent_id_s, sent_id_s, text_s, table]
             md_s = '\n'.join(md_l)
             tb_l.append(md_s)
     tb_s = '\n\n'.join(tb_l)
