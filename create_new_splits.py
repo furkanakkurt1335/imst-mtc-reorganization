@@ -76,11 +76,11 @@ for doc_id, avg_token_count in doc_l:
     if doc_id in docs_used:
         continue
     split = None
-    if sent_count_d['dev'] + sent_count <= 1200:
+    if sent_count_d['dev'] + sent_count <= 1100:
         split = 'dev'
-    elif sent_count_d['test'] + sent_count <= 1200:
+    elif sent_count_d['test'] + sent_count <= 1100:
         split = 'test'
-    elif sent_count_d['train'] + sent_count <= 3235:
+    else:
         split = 'train'
     if split is None:
         continue
