@@ -20,12 +20,12 @@ for k, v in treebank_d.items():
         size_t = s.find_longest_match().size
         if size_t == len(text_t):
             doc_id_max = doc_id
-            idx = s.find_longest_match().b
+            idx = s.find_longest_match().a
             break
         elif size_t > max_size:
             max_size = size_t
             doc_id_max = doc_id
-            idx = s.find_longest_match().b
+            idx = s.find_longest_match().a
     doc_id = doc_id_max
     if doc_id not in sent_corp_d.keys():
         sent_corp_d[doc_id] = {}
@@ -34,7 +34,7 @@ for k, v in treebank_d.items():
     if counter % 100 == 0:
         print('Remaining: {}'.format(tb_len - counter))
         with open('sent_corp.json', 'w', encoding='utf-8') as f:
-            json.dump(sent_corp_d, f, ensure_ascii=False, indent=4, ensure_ascii=False)
+            json.dump(sent_corp_d, f, indent=4, ensure_ascii=False)
 
 with open('sent_corp.json', 'w', encoding='utf-8') as f:
-    json.dump(sent_corp_d, f, ensure_ascii=False, indent=4, ensure_ascii=False)
+    json.dump(sent_corp_d, f, indent=4, ensure_ascii=False)
